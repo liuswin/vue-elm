@@ -29,6 +29,26 @@
           <p class="text">{{food.info}}</p>
         </div>
         <Split></Split>
+        <div class="rating">
+          <h1 class="title">商品评价</h1>
+          <RatingSelect :select-type="selectType" :only-content="onlyContent" :desc="desc" :ratings="food.ratings" v-on:ratingtype-select="onRatingTypeSelect"  v-on:content-toggle="onToggleContent"></RatingSelect>
+          <div class="rating-wrapper">
+            <ul v-show="food.ratings && food.ratings.length">
+              <li v-show="needShow(rating.rateType, rating.text)" v-for="(rating, index) in food.ratings" :key="index" class="rating-item">
+                <div class="user">
+                  <span class="name">{{rating.username}}</span>
+                  <img :src="rating.avatar" class="avatar" width="12" height="12">
+                </div>
+                <div class="time">{{rating.rateTime}}</div>
+                <p class="text">
+                  <span :class="{'icon-thumb_up': rating.rateType === 0, 'icon-thumb_down': rating.rateType === 1}"></span>
+                  {{rating.text}}
+                </p>
+              </li>
+            </ul>
+            <div class="no-rating" v-show="!food.ratings || !food.ratings.length"></div>
+          </div>
+        </div>
       </div>
     </div>
   </transition>
@@ -40,6 +60,11 @@ import BScroll from 'better-scroll';
 import Price from 'components/Price/price';
 import CartControl from 'components/CartControl/cartcontrol';
 import Split from 'components/Split/split';
+import RatingSelect from 'components/RatingSelect/ratingSelect';
+
+// const POSITIVE = 0;
+// const NEGATIVE = 1;
+const ALL = 2;
 
 export default {
   props: {
@@ -49,13 +74,21 @@ export default {
   },
   data() {
     return {
-      showFlag: false
+      showFlag: false,
+      selectType: ALL,
+      onlyContent: true,
+      desc: {
+        all: '全部',
+        positive: '推荐',
+        negative: '吐槽'
+      }
     };
   },
   components: {
     Price,
     CartControl,
-    Split
+    Split,
+    RatingSelect
   },
   watch: {},
   computed: {
@@ -63,6 +96,8 @@ export default {
   methods: {
     show() {
       this.showFlag = true;
+      this.selectType = ALL;
+      this.onlyContent = true;
       this.$nextTick(() => {
         if (!this.scroll) {
           this.scroll = new BScroll(this.$refs.food, {
@@ -82,6 +117,22 @@ export default {
       }
       Vue.set(this.food, 'count', 1);
       this.$emit('cart-add', event.target);
+    },
+    needShow(type, text) {
+      if (this.onlyContent && !text) {
+        return false;
+      }
+      if (this.selectType === ALL) {
+        return true;
+      } else {
+        return type === this.selectType;
+      }
+    },
+    onRatingTypeSelect(event) {
+      this.selectType = event;
+    },
+    onToggleContent(event) {
+      this.onlyContent = !event;
     }
   },
   created() {},
@@ -90,6 +141,8 @@ export default {
 </script>
 
 <style lang="stylus">
+@import '../../common/stylus/mixin.styl';
+
 .food-wrapper
   position: fixed;
   left: 0
@@ -193,4 +246,60 @@ export default {
       padding: 0 8px
       font-size: 12px
       color: rgb(77, 85, 93)
+
+  .rating
+    padding-top: 18px
+
+    .title
+      line-height: 14px
+      margin-left: 18px
+      font-size: 14px
+      color: rgb(7, 17, 27)
+
+    .rating-wrapper
+      padding: 0 18px
+
+      .rating-item
+        position: relative
+        padding: 16px 0
+        border-1px(rgba(7, 17, 27, 0.1))
+
+        .user
+          position: absolute
+          top: 16px
+          right: 0
+          line-height: 12px
+          font-size: 0
+
+          .name
+            display: inline-block
+            vertical-align: top
+            margin-right: 6px
+            font-size: 10px
+            color: rgb(147, 153, 159)
+
+          .avatar
+            border-radius: 50%
+
+        .time
+          margin-bottom: 6px
+          line-height: 12px
+          font-size: 10px
+          color: rgb(147, 153, 159)
+
+        .text
+          line-height: 16px
+          font-size: 12px
+          color: rgb(7, 17, 27)
+
+          .icon-thumb_up, .icon-thumb_down
+            margin-right: 4px
+            line-height: 16px
+            font-size: 12px
+
+          .icon-thumb_up
+            color: rgb(0, 160, 220)
+
+          .icon-thumb_down
+            color: rgb(147, 153, 159)
 </style>
