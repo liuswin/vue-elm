@@ -25,11 +25,18 @@
         </div>
       </div>
     </div>
+    <Split></Split>
+    <RatingSelect :select-type="selectType" :only-content="onlyContent" :desc="desc" :ratings="ratings"></RatingSelect>
   </div>
 </template>
 
 <script>
+import appData from '../../../data.json';
 import Star from 'components/Star/star';
+import Split from 'components/Split/split';
+import RatingSelect from 'components/RatingSelect/ratingSelect';
+
+const ALL = 2;
 
 export default {
   props: {
@@ -37,8 +44,31 @@ export default {
       type: Object
     }
   },
+  data() {
+    return {
+      ratings: [],
+      showFlag: false,
+      selectType: ALL,
+      onlyContent: true,
+      desc: {
+        all: '全部',
+        positive: '推荐',
+        negative: '吐槽'
+      }
+    }
+  },
+  created() {
+    // this.classMap = ['decrease', 'discount', 'guarantee', 'invoice', 'special'];
+    this.ratings = appData.ratings;
+    // this.$nextTick(() => {
+    //   this._initScroll();
+    //   this._calculateHeight();
+    // });
+  },
   components: {
-    Star
+    Star,
+    Split,
+    RatingSelect
   }
 };
 </script>
