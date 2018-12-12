@@ -70,13 +70,14 @@ export default {
   methods: {},
   created() {
     this.classMap = ['decrease', 'discount', 'guarantee', 'invoice', 'special'];
+  },
+  mounted() {
     this.$nextTick(() => {
       this.scroll = new BScroll(this.$refs.seller, {
         click: true
       });
     });
-  },
-  mounted() {}
+  }
 };
 </script>
 
